@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Présentation BIOS</title>
+  <style>
+    :root{
+      --bg1: #2b0b3a; 
+      --bg2: #3b1a6b;
+      --accent: #ffd24d; 
+      --text: #f5f5f7;
+      --muted: rgba(245,245,247,0.8);
+      --glass: rgba(255,255,255,0.04);
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: 'SF Pro Display', 'Arial Rounded MT Bold', Inter, Poppins, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      overflow:hidden;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      animation: gradientShift 15s ease infinite alternate;
+    }
+
+    @keyframes gradientShift {
+      0% { background: linear-gradient(135deg, #2b0b3a, #3b1a6b); }
+      50% { background: linear-gradient(135deg, #3b1a6b, #ffd24d); }
+      100% { background: linear-gradient(135deg, #2b0b3a, #3b1a6b); }
+    }
+
+    #particlesCanvas{
+      position:absolute; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none;
+    }
+
+    .slide{
+      position:absolute;
+      top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      width:420px;
+      padding:28px;
+      border-radius:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 0 20px rgba(255, 210, 77, 0.22), 0 4px 24px rgba(0,0,0,0.35);
+      backdrop-filter: blur(14px);
+      border:1px solid rgba(255,255,255,0.13);
+      opacity:0;
+      transition: opacity .6s ease;
+      z-index:1;
+      pointer-events:none;
+      text-align:center;
+      font-weight:bold;
+    }
+
+    .slide.active{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    h1{ font-size:22px; font-weight:800; margin:0 0 12px 0; }
+    p, ul{ font-size:15px; color:var(--muted); line-height:1.5; text-align:left; }
+    ul{ padding-left:20px; }
+    li{ margin-bottom:8px; }
+
+    .input-row{ display:flex; flex-direction:column; gap:10px; margin-bottom:14px; text-align:left; }
+    label{ font-size:13px; color:var(--muted); font-weight:bold; }
+    input[type="text"], input[type="password"]{
+      width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);
+      background:var(--glass); color:var(--text); font-size:15px; outline:none; font-weight:bold;
+      transition: box-shadow .18s, transform .12s;
+    }
+    input:focus{ box-shadow: 0 0 14px rgba(255, 210, 77, 0.6), 0 6px 22px rgba(0,0,0,0.45); transform: translateY(-1px); }
+
+    .actions{ display:flex; gap:10px; margin-top:12px; justify-content:space-between; }
+    button{ padding:10px 16px; border-radius:10px; border:0; font-weight:700; cursor:pointer; font-size:14px; }
+    .btn-unlock{ background: linear-gradient(90deg, #ffd24d, #ffc107); color:#0b0b0b; box-shadow: 0 0 14px rgba(255, 210, 77, 0.6), 0 8px 22px rgba(255,190,40,0.18); transition: transform .2s; }
+    .btn-unlock:hover{ transform: scale(1.05); }
+    .btn-cancel{ background: transparent; color:var(--muted); }
+    .msg { margin-top:12px; font-size:14px; color:#ffb3b3; min-height:18px; }
+    .success { color: #b7ffbf; text-shadow:0 0 12px #b7ffbf; }
+
+    .small-note{ margin-top:16px; font-size:13px; color:var(--muted); text-align:center; }
+
+    .navigation{
+      display:flex;
+      justify-content:space-between;
+      margin-top:20px;
+    }
+
+    .btn-prev, .btn-next{
+      padding:8px 16px;
+      border-radius:10px;
+      border:none;
+      font-weight:700;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    .btn-prev{
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
+    }
+
+    .btn-next{
+      background: var(--accent);
+      color: #0b0b0b;
+    }
+    .btn-next:hover{ transform: scale(1.05); transition:.2s;}
+    .btn-prev:hover{ transform: scale(1.05); transition:.2s;}
+  </style>
+</head>
+<body>
+  <canvas id="particlesCanvas"></canvas>
+
+  <!-- Slide 1: Lock Screen -->
+  <div class="slide active" id="slide1">
+    <h1>Locked — ILYASS</h1>
+    <p>Enter your ID and password to unlock</p>
+    <form id="lockForm" autocomplete="off" novalidate>
+      <div class="input-row">
+        <label for="userId">User ID</label>
+        <input id="userId" type="text" placeholder="e.g. ILYASS" required />
+      </div>
+      <div class="input-row">
+        <label for="pwd">Password</label>
+        <input id="pwd" type="password" placeholder="Enter password" required />
+      </div>
+      <div class="actions">
+        <button type="button" class="btn-cancel" id="btnClear">Clear</button>
+        <button type="submit" class="btn-unlock">Unlock</button>
+      </div>
+      <div class="msg" id="message"></div>
+      <div class="small-note">Demo only — do not store real credentials here.</div>
+    </form>
+  </div>
+
+  <!-- Slide 2: Welcome Screen -->
+  <div class="slide" id="slideWelcome">
+    <h1>Bienvenue, ILYASS ✅</h1>
+    <p class="subtitle">Système déverrouillé avec succès</p>
+    <div class="navigation">
+      <div></div>
+      <button class="btn-next">Suivant</button>
+    </div>
+  </div>
+
+  <!-- Slide 3: Définition du BIOS -->
+  <div class="slide" id="slide2">
+    <h1>Qu'est-ce que le BIOS ?</h1>
+    <p><strong>BIOS</strong> signifie <em>Système d'entrée/sortie de base</em>. C'est un programme de la carte mère qui initialise le matériel et démarre l'ordinateur.</p>
+    <div class="navigation">
+      <button class="btn-prev">Précédent</button>
+      <button class="btn-next">Suivant</button>
+    </div>
+  </div>
+
+  <!-- Slide 4: Fonctions du BIOS -->
+  <div class="slide" id="slide3">
+    <h1>Fonctions du BIOS</h1>
+    <ul>
+      <li>Initialisation des composants (CPU, RAM, stockage).</li>
+      <li>Test de démarrage (POST).</li>
+      <li>Lancement du système d'exploitation.</li>
+      <li>Accès au menu BIOS pour la configuration.</li>
+      <li>Gestion des entrées/sorties matériel.</li>
+    </ul>
+    <div class="navigation">
+      <button class="btn-prev">Précédent</button>
+      <button class="btn-next">Suivant</button>
+    </div>
+  </div>
+
+  <!-- Slide 5: Informations et Conseils BIOS -->
+  <div class="slide" id="slide4">
+    <h1>Conseils et Informations BIOS</h1>
+    <ul>
+      <li>Le BIOS peut être mis à jour (flashage), opération à effectuer avec précaution.</li>
+      <li>Le BIOS contrôle l'ordre de démarrage des disques.</li>
+      <li>Paramètres avancés : réglage de la mémoire, processeur, sécurité.</li>
+      <li>L'UEFI remplace le BIOS classique sur les ordinateurs récents.</li>
+      <li>Garder un mot de passe BIOS pour sécuriser l'accès.</li>
+    </ul>
+    <div class="navigation">
+      <button class="btn-prev">Précédent</button>
+      <button class="btn-next">Suivant</button>
+    </div>
+  </div>
+
+  <!-- Slide 6: Historique du BIOS -->
+  <div class="slide" id="slide5">
+    <h1>Historique du BIOS</h1>
+    <ul>
+      <li>Existant depuis les années 1980 sur PC.</li>
+      <li>À l'origine très simple, a évolué pour plus de fonctionnalités.</li>
+      <li>Remplacé par l’UEFI sur les ordinateurs modernes.</li>
+      <li>Essentiel pour le démarrage et la gestion des composants.</li>
+    </ul>
+    <div class="navigation">
+      <button class="btn-prev">Précédent</button>
+      <button class="btn-next">Suivant</button>
+    </div>
+  </div>
+
+  <!-- Slide 7: Merci -->
+  <div class="slide" id="slide6">
+    <h1>Merci !</h1>
+    <p>Merci à l'enseignant et à tous les étudiants pour votre attention et lecture.</p>
+    <p class="small-note">Le BIOS, petite puce, grande importance !</p>
+    <div class="navigation">
+      <button class="btn-prev">Précédent</button>
+      <div></div>
+    </div>
+  </div>
+
+  <script>
+    const CORRECT_ID = "ILYASS";
+    const CORRECT_PWD = "TCT-3";
+
+    const form = document.getElementById('lockForm');
+    const inputId = document.getElementById('userId');
+    const inputPwd = document.getElementById('pwd');
+    const message = document.getElementById('message');
+
+    const slides = [
+      document.getElementById('slide1'),
+      document.getElementById('slideWelcome'),
+      document.getElementById('slide2'),
+      document.getElementById('slide3'),
+      document.getElementById('slide4'),
+      document.getElementById('slide5'),
+      document.getElementById('slide6'),
+    ];
+
+    btnClear = document.getElementById('btnClear');
+    btnClear.addEventListener('click', () => {
+      inputId.value = "";
+      inputPwd.value = "";
+      message.textContent = "";
+      inputId.focus();
+    });
+
+    let currentSlide = 0;
+
+    function showSlide(index){
+      if(index<0) index=0;
+      if(index>=slides.length) index=slides.length-1;
+      slides.forEach(s=> s.classList.remove("active"));
+      slides[index].classList.add("active");
+      currentSlide = index;
+    }
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      if(inputId.value.trim()===CORRECT_ID && inputPwd.value===CORRECT_PWD){
+        message.textContent = "Unlocked ✅";
+        message.classList.add("success");
+        showSlide(1); // Welcome screen
+      } else {
+        message.textContent = "ID ou mot de passe incorrect !";
+        message.classList.remove("success");
+        inputPwd.value="";
+        inputPwd.focus();
+      }
+    });
+
+    // Navigation buttons
+    document.querySelectorAll('.btn-prev').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        showSlide(currentSlide-1);
+      });
+    });
+    document.querySelectorAll('.btn-next').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        showSlide(currentSlide+1);
+      });
+    });
+
+    // --- Particles background ---
+    const canvas = document.getElementById("particlesCanvas");
+    const ctx = canvas.getContext("2d");
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener("resize", ()=>{
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const particles = [];
+    const particleCount = 100;
+
+    for(let i=0;i<particleCount;i++){
+      particles.push({
+        x: Math.random()*width,
+        y: Math.random()*height,
+        radius: Math.random()*2+1,
+        dx: (Math.random()-0.5)*0.5,
+        dy: (Math.random()-0.5)*0.5,
+        color: ["#ffd24d","#3b1a6b","#2b0b3a"][Math.floor(Math.random()*3)],
+        glow: Math.random()*10+5
+      });
+    }
+
+    function animateParticles(){
+      ctx.clearRect(0,0,width,height);
+      for(let p of particles){
+        p.x += p.dx;
+        p.y += p.dy;
+        if(p.x<0||p.x>width) p.dx*=-1;
+        if(p.y<0||p.y>height) p.dy*=-1;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = p.glow;
+        ctx.fill();
+      }
+      requestAnimationFrame(animateParticles);
+    }
+
+    animateParticles();
+  </script>
+</body>
+</html>
