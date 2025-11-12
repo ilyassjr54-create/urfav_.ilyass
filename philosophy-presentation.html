@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TCT‑3 – عرض الفلاسفة</title>
+  <style>
+    body, html {
+      margin:0; padding:0; overflow:hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight:600;
+      height:100%; width:100%;
+      background: linear-gradient(135deg, #ffd700, #b783ff);
+    }
+    canvas {
+      position: fixed; top:0; left:0;
+      width:100%; height:100%; z-index:0;
+      pointer-events:none;
+    }
+    .top-bar {
+      position: fixed; top:0; width:100%; height:50px;
+      background-color: rgba(0,0,0,0.65);
+      color:#fff; display:flex; align-items:center; justify-content:center;
+      font-size:22px; font-weight:bold; z-index:10;
+      box-shadow:0 2px 10px rgba(0,0,0,0.5);
+    }
+    .screen-container {
+      position:absolute; top:0; left:0; width:100%; height:100%;
+      display:none; flex-direction:column; align-items:center; justify-content:center;
+      z-index:5; padding:50px 40px; text-align:center; color:#fff;
+    }
+    .screen-container.active { display:flex; }
+    .screen-content {
+      background-color: rgba(0,0,0,0.75);
+      padding:60px 50px; border-radius:20px;
+      width:900px; max-width:95%;
+      display:flex; flex-direction:column; gap:25px;
+      box-shadow:0 15px 45px rgba(0,0,0,0.8);
+    }
+    .screen-content h1 { font-size:28px; font-weight:bold; }
+    .screen-content p { font-size:17px; line-height:1.5; text-align:justify; font-weight:600; }
+    .screen-content img {
+      width:180px; border-radius:12px; margin:10px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.5);
+      transition: transform 0.5s ease;
+    }
+    .screen-content img:hover {
+      transform: scale(1.1) rotate(3deg);
+      box-shadow:0 0 30px #ffd700, 0 0 40px #b783ff;
+    }
+    input[type="password"] {
+      padding:15px; width:100%; border-radius:12px; border:none; font-size:18px;
+      text-align:center; background:rgba(255,255,255,0.1); color:#fff;
+      box-shadow:0 0 15px rgba(255,255,255,0.1);
+      transition: all 0.4s ease;
+    }
+    input[type="password"]:focus {
+      outline:none; box-shadow:0 0 25px rgba(255,255,255,0.8);
+      background:rgba(255,255,255,0.15);
+    }
+    input::placeholder { color:#ddd; }
+    button {
+      padding:12px 0; border:none; border-radius:15px;
+      font-weight:bold; cursor:pointer;
+      transition: all 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    }
+    .nav-buttons {
+      position:fixed; top:50%; right:20px;
+      transform:translateY(-50%);
+      display:none; z-index:6; flex-direction:column; gap:15px;
+    }
+    .nav-buttons button {
+      width:120px;
+      background: linear-gradient(135deg, #ffd700, #b783ff);
+      color:#fff; box-shadow:0 5px 20px rgba(0,0,0,0.5);
+    }
+    .nav-buttons button:hover {
+      transform:scale(1.05);
+      box-shadow:0 0 30px rgba(255,215,0,0.9);
+    }
+    .nav-buttons button:active {
+      transform:scale(0.95);
+      box-shadow:0 0 25px rgba(255,215,0,1);
+    }
+    .error { color:#ff4d4d; font-size:16px; display:none; }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">TCT‑3</div>
+
+<!-- شاشة القفل -->
+<div class="screen-container active" id="lockScreen">
+  <div class="screen-content">
+    <h1>أدخل كلمة المرور</h1>
+    <input type="password" id="passwordInput" placeholder="كلمة المرور">
+    <button onclick="checkPassword()">دخول</button>
+    <div class="error" id="errorMsg">كلمة المرور غير صحيحة!</div>
+  </div>
+</div>
+
+<!-- شاشة الترحيب -->
+<div class="screen-container" id="welcomeScreen">
+  <div class="screen-content">
+    <h1>مرحبا بالجميع! <span>👋📱</span></h1>
+    <p>أهلاً بالأستاذ المحترم والتلاميذ الأعزاء في TCT‑3</p>
+  </div>
+</div>
+
+<!-- تقديم الفلاسفة الأربعة -->
+<div class="screen-container" id="introScreen">
+  <div class="screen-content">
+    <h1>تقديم الفلاسفة الأربعة</h1>
+    <p>في هذا العرض سنتعرف على أربعة فلاسفة مهمين:<br>
+       ريمون لول، لوكيوس أنايوس سينيكا، آدم سميث، و سلافوي جيجيك.<br>
+       سنستعرض حياتهم وأفكارهم وإسهاماتهم الفلسفية بطريقة جذابة وممتعة.</p>
+  </div>
+</div>
+
+<!-- ريمون لول -->
+<div class="screen-container" id="philosopher1">
+  <div class="screen-content">
+    <h1>ريمون لول 📚</h1>
+    <p>
+      وُلِدَ حوالي عام 1232‑1233 في جزيرة مايوركا. في شبابه عاش حياة ترفيهية ثم تغيّرت حياته بالكامل بعد رؤية دينية. كرّس نفسه للدراسة والدعوة، وطوّر منظومة فلسفية تُعرف بـ "Ars Magna".  
+      كتب العديد من الكتب والمخطوطات التي تتناول الفلسفة والمنطق والدين. كان رحّالاً مستكشفًا للمعرفة، زار العديد من المدن الأوروبية والشرق الأوسط لنشر أفكاره.  
+      أثره امتد إلى الفلسفة الأوروبية واللاهوت، وكان أحد المؤثرين في تطور المنطق الرمزي والمفاهيم المنهجية.
+    </p>
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:15px;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/16/Francisco_Ribalta_-_Ramon_Llull_-_Google_Art_Project.jpg" alt="ريمون لول 1">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/8f/Ramon_Llull_-_Ars_Magna_Fig_1.png" alt="ريمون لول 2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Ramon_Llull_1232-1316.jpg" alt="ريمون لول 3">
+    </div>
+  </div>
+</div>
+
+<!-- سينيكا -->
+<div class="screen-container" id="philosopher2">
+  <div class="screen-content">
+    <h1>لوكيوس أنايوس سينيكا 🏛️</h1>
+    <p>
+      وُلد عام 4 ق.م وتوفي عام 65 م. فيلسوف روماني من المدرسة الرواقيّة، كاتباً ومستشاراً للإمبراطور نيرون. كتب رسائل ومقالات حول الأخلاق والحكمة، منها: "رسائل إلى لوسليوس"، و"عن الحياة القصيرة".  
+      ركّز على السعادة الداخلية، التحكم في النفس، مواجهة المصاعب برباطة جأش. اهتم بالفلسفة السياسية وأثر الأخلاق على المجتمع، ويُعدّ من أهم المفكرين الرواقيين الذين أثروا على الفكر الأوروبي.
+    </p>
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:15px;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Seneca_Museo_Capitolino.jpg" alt="سينيكا 1">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Seneca_Bust.jpg" alt="سينيكا 2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Seneca_1.jpg" alt="سينيكا 3">
+    </div>
+  </div>
+</div>
+
+<!-- آدم سميث -->
+<div class="screen-container" id="philosopher3">
+  <div class="screen-content">
+    <h1>آدم سميث 💰</h1>
+    <p>
+      وُلِد في 1723 وتوفي في 1790، فيلسوف اقتصادي أسكتلندي. مؤلف كتاب "ثروة الأمم" و"نظرية الأخلاق". أسس الاقتصاد الكلاسيكي وتحدث عن اليد الخفية للسوق، وتقسيم العمل، وأهمية الحرية الاقتصادية.  
+      درس الأخلاق والطبيعة البشرية والعدالة والفضيلة، ووضح أن الاقتصاد مرتبط دائمًا بالسلوك الإنساني والمجتمعات. 
+    </p>
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:15px;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/AdamSmith.jpg" alt="آدم سميث 1">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Adam_Smith_portrait.jpg" alt="آدم سميث 2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Adam_Smith_Miniature.jpg" alt="آدم سميث 3">
+    </div>
+  </div>
+</div>
+
+<!-- سلافوي جيجيك -->
+<div class="screen-container" id="philosopher4">
+  <div class="screen-content">
+    <h1>سلافوي جيجيك 🎬</h1>
+    <p>
+      وُلِد عام 1949 في سلوفينيا. فيلسوف وعالم نفس وسوسيولوجيا، اشتهر بتحليل الثقافة الشعبية، السينما، والأيديولوجيا المعاصرة. كتب أكثر من 70 كتاباً، من أبرزها: "Living in the End Times"، "The Sublime Object of Ideology"، و"Less Than Nothing".  
+      يعتمد على فرويد وهيجل وماركس في تفسير المجتمعات الحديثة، ويتميّز بأسلوبه الساخر والتحليلي العميق للأفكار.
+    </p>
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:15px;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Slavoj_%C5%BDi%C5%BEek_2012.jpg" alt="سلافوي جيجيك 1">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/Slavoj_Zizek_crop_2017.jpg" alt="سلافوي جيجيك 2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/7f/Slavoj_Zizek_2018.jpg" alt="سلافوي جيجيك 3">
+    </div>
+  </div>
+</div>
+
+<!-- شاشة النهاية -->
+<div class="screen-container" id="endScreen">
+  <div class="screen-content">
+    <h1>شكراً لمتابعتكم! 🎉</h1>
+    <p>نأمل أن تكونوا قد استمتعتم بالتعرف على الفلاسفة الأربعة ومعلوماتهم القيمة.</p>
+  </div>
+</div>
+
+<!-- أزرار التنقل -->
+<div class="nav-buttons" id="navButtons">
+  <button id="prevBtn">السابق</button>
+  <button id="nextBtn">التالي</button>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+
+<script>
+// --- التحكم بالشاشات ---
+const screens = ["lockScreen","welcomeScreen","introScreen","philosopher1","philosopher2","philosopher3","philosopher4","endScreen"];
+let currentScreen = 0;
+function showScreen(index){
+  screens.forEach((id,i)=>{
+    const el = document.getElementById(id);
+    if(i === index) el.classList.add("active");
+    else el.classList.remove("active");
+  });
+  document.getElementById('navButtons').style.display = (currentScreen > 0) ? 'flex' : 'none';
+}
+
+// أزرار التنقل
+document.getElementById('nextBtn').addEventListener('click',()=>{
+  if(currentScreen < screens.length-1){
+    currentScreen++;
+    showScreen(currentScreen);
+  }
+});
+document.getElementById('prevBtn').addEventListener('click',()=>{
+  if(currentScreen > 0){
+    currentScreen--;
+    showScreen(currentScreen);
+  }
+});
+
+// شاشة القفل
+const correctPassword = "ilyass5010";
+function checkPassword(){
+  const input = document.getElementById('passwordInput').value.trim();
+  const errorMsg = document.getElementById('errorMsg');
+  if(input === correctPassword){
+    currentScreen = 1;
+    showScreen(currentScreen);
+  } else {
+    errorMsg.style.display = 'block';
+  }
+}
+document.getElementById('passwordInput').addEventListener("keyup", function(e){
+  if(e.key === "Enter") checkPassword();
+});
+
+// الخلفية الديناميكية
+const canvasEl = document.getElementById("bgCanvas");
+const ctx = canvasEl.getContext("2d");
+let width = canvasEl.width = window.innerWidth;
+let height = canvasEl.height = window.innerHeight;
+const particles = [];
+const particleCount = 150;
+let t = 0;
+
+function lerpColor(a,b,t){
+  return [Math.floor(a[0] + (b[0]-a[0])*t),
+          Math.floor(a[1] + (b[1]-a[1])*t),
+          Math.floor(a[2] + (b[2]-a[2])*t)];
+}
+
+function createParticles(){
+  particles.length = 0;
+  for(let i=0; i<particleCount; i++){
+    particles.push({
+      x: Math.random()*width,
+      y: Math.random()*height,
+      z: Math.random()*2 + 0.5,
+      radius: Math.random()*3 + 1,
+      dx: (Math.random()-0.5)*1.2,
+      dy: (Math.random()-0.5)*1.2,
+      trail: []
+    });
+  }
+}
+createParticles();
+
+function animate(){
+  t += 0.001;
+  if(t > 1) t = 0;
+  const gold = [255,215,0], purple = [183,131,255];
+  const c1 = lerpColor(gold, purple, (Math.sin(t*Math.PI)*0.5 + 0.5));
+  const c2 = lerpColor(purple, gold, (Math.sin(t*Math.PI)*0.5 + 0.5));
+  document.body.style.background = `linear-gradient(135deg,rgb(${c1}),rgb(${c2}))`;
+
+  ctx.clearRect(0,0,width,height);
+  particles.forEach(p => {
+    p.trail.push({ x:p.x, y:p.y, alpha:0.25 });
+    if(p.trail.length > 6) p.trail.shift();
+    p.trail.forEach(tr=>{
+      ctx.beginPath();
+      ctx.arc(tr.x, tr.y, p.radius, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${tr.alpha})`;
+      ctx.fill();
+    });
+    const particleColor = `rgba(${c2[0]},${c2[1]},${c2[2]},0.85)`;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius*p.z, 0, Math.PI*2);
+    ctx.fillStyle = particleColor;
+    ctx.fill();
+    particles.forEach(other=>{
+      const dx = p.x - other.x, dy = p.y - other.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if(dist < 120){
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(other.x, other.y);
+        ctx.strokeStyle = `rgba(255,255,255,0.12)`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    });
+    p.x += p.dx; p.y += p.dy;
+    if(p.x < 0 || p.x > width) p.dx *= -1;
+    if(p.y < 0 || p.y > height) p.dy *= -1;
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+window.addEventListener("resize", ()=>{
+  width = canvasEl.width = window.innerWidth;
+  height = canvasEl.height = window.innerHeight;
+});
+</script>
+
+</body>
+</html>
